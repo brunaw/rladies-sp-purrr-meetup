@@ -1,0 +1,289 @@
+---
+title: "R-Ladies São Paulo Meetup"
+subtitle: "googleAnalyticsR & purrr"
+author: Alissa Mune & Bruna Wundervald
+date: 21 de Março, 2019
+output:
+  xaringan::moon_reader:
+    css: ["default", "css/my-theme.css", "css/my-fonts.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      beforeInit: "https://platform.twitter.com/widgets.js"
+    includes:
+      in_header: header.html  
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.align = 'center',
+                      warning = FALSE, message = FALSE)
+```
+
+# Apoio
+
+
+.center2[
+```{r, echo = FALSE, out.width="100%"}
+knitr::include_graphics("img/logo-fiap/logo-fiap-magenta.jpg")
+```
+]
+
+---
+
+# Antes de começar
+
+**WiFi: FIAP-RLADIES**
+  - Senha: R#ladies@FP19
+
+**Códigos, dados e arquivo da apresentação em**:
+https://github.com/brunaw/rladies-sp-purrr-meetup
+
+**Link direto para a apresentação:** http://brunaw.com/slides/rladies-sp/21-03-2019/meetup.html
+
+---
+
+# O `tidyverse`
+
+> Coletânea de pacotes para ciência de dados no R
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r, echo = FALSE, out.width="70%"}
+knitr::include_graphics("img/tidyverse.png")
+```
+
+
+---
+
+# Google Analytics com o pacote `googleAnalyticsR`
+
+O pacote `googleAnalyticsR` nos permite extrair dados da API do 
+[Google Analytics](https://analytics.google.com/) usando `R` :)
+
+.pull-left[
+```{r, echo = FALSE, out.width="50%"}
+knitr::include_graphics("img/ana.png")
+```
+]
+
+.pull-right[
+
+- Autenticação:
+   - Se baseia no `account`, `property` e `vista`;
+    - É gerado um arquivo (.httr-oauth) quando rodamos a função 
+    `ga_auth()`;
+- Temos acesso aos dados apenas daquela vista; 
+
+]
+
+---
+
+# Sobre o  `googleAnalyticsR`
+
+
+# Explorando o Google Analytics;
+
+---
+
+# Métricas e Dimensões: o que são os escopos?
+
+  - Métricas: são variáveis quantitativas, como sessões e transações;
+  
+  - Dimensões: são variáveis qualitativas como `landingPage` e gênero;
+
+
+> Todas as variáveis podem ser exportadas juntas? Não: existem escopos. 
+
+- Sobre o site do Processo Eletrônico; 
+
+
+---
+
+# O `purrr`
+
+.pull-left[
+```{r, echo = FALSE, out.width="50%"}
+knitr::include_graphics("img/purrr.png")
+```
+]
+
+.pull-right[
+>  É um *toolkit* de programação funcional para o `R`. 
+
+- Principais vantagens:
+  - Permite trabalhar com **listas** de forma eficiente no `R`;
+  - Substitui o uso excessivo de `loops`, como `for`;
+  - Melhora a leitura do código;
+  - Escrita mais rápida :)
+]
+
+---
+
+# Exemplo motivacional 
+
+Suponha que nós temos uma lista com 3 dataframes (um em cada
+posição da lista), nomeado `minha_listas`. Uma operação com `for`
+nessa lista tem a seguinte sintaxe:
+
+```{r, echo = FALSE}
+minhas_listas <- split(iris, as.factor(iris$Species))
+```
+
+```{r}
+for(i in 1:3){
+  print(nrow(minhas_listas[[i]]))
+}
+```
+
+
+ - Existem casos aonde cada iteração de um `loop` depende da anterior;
+ 
+ - Aqui, o `for` não tem **nenhuma** razão de existir, exceto 
+repetir a mesma tarefa para cada elemento da lista.
+
+  - Entra em cena o `purrr::map()` 
+
+---
+
+# `purrr::map()`
+
+  - A família `map` compõe o núcleo do `purrr`; 
+  - Ideia principal: repetir funções alterando um ou mais
+  parâmetros. 
+  
+O exemplo anterior, usando `map()`:
+
+```{r}
+minhas_listas %>% purrr::map(nrow)
+```
+
+Ou seja, nós **mapeamos** a função `nrow()` em cada elemento 
+da lista. 
+
+
+---
+
+# `purrr::map()`
+
+- E se eu quiser usar funções mais 'complexas'
+dentro do `map()`?
+
+O `purrr` permite:
+  - Usar qualquer função, seja ela escrita por você ou de algum
+  pacote;
+  - Criar uma sintaxe que equivale a uma função dentro do 
+  `map()`. 
+  
+
+```{r}
+minhas_listas %>% purrr::map(
+  ~{ mean( .x$Sepal.Width ) } 
+)
+```
+
+aonde **.x** representa cada elemento da lista aonde estamos
+aplicando a função. 
+
+---
+
+# `purrr::map()`
+
+- E se minha função tiver mais de um parâmetro?
+
+Basta utilizá-los normalmente, o `map()` entende que as listas
+irão ser usados como o parâmetro que não for fornecido. 
+
+```{r}
+minhas_listas %>% purrr::map(
+   head, n  = 1
+)
+
+
+```
+
+
+
+---
+
+# As extensões do `purrr::map()`
+
+Os resultados do `map()` são uma lista. 
+Dependendo do tipo dos objetos resultantes, existem algumas
+extensões do `map()` que facilitam a nossa vida, como:
+
+  - `purrr::map_chr()`: resultado em string/caractere; 
+  - `purrr::map_dbl()`: resultado em números;
+  - `purrr::map_dfr()`: resultado em dataframe. 
+
+Exemplo:
+
+```{r}
+minhas_listas %>% purrr::map_dbl(length)
+```
+
+
+---
+
+# `purrr::map2()`
+
+> `purrr::map2()` tem 2 listas de entrada
+
+```{r}
+x <- list(1, 10, 100)
+y <- list(1, 2, 3)
+
+map2_dbl(x, y, ~.x + .y) 
+```
+ 
+
+---
+
+# `purrr::pmap()`
+
+> `purrr::pmap()` é a generalização para n listas. 
+
+```{r}
+l <- list(a = x, b = y, 
+          c = x %>% purrr::map(~.x^2))
+
+pmap(l, function(a, b, c){
+  a/b  + c/100
+})
+```
+ 
+
+
+
+---
+
+# O `purrr` além do `map()`
+
+O `purrr` ainda contém diversas funções para lidar com listas
+e funções:  
+
+  - `reduce()`: aplica uma mesma função diversas vezes em um objeto;
+  - `discard()` & `keep()`: descartar/manter
+  listas de acordo com algum critério;
+  - Família `cross()` para passar mais de um parâmetro
+  variante para a função;
+  - Família `safely()` para lidar com erros de funções;
+  - Família `flatten_()` para a simplificação de listas; 
+  - `etc`.
+  
+Vamos ao código.
+
+---
+
+class: bottom, center, inverse
+
+<font size="30">Obrigada! </font>
+
+
+```{r, echo = FALSE, out.width="50%"}
+knitr::include_graphics("img/rladies.png")
+```
