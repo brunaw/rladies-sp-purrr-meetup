@@ -86,7 +86,10 @@ knitr::include_graphics("img/ana.png")
 # Sobre o  `googleAnalyticsR`
 
 
-# Explorando o Google Analytics;
+>  Explorando o Google Analytics;
+
+- email: 7meetuprladies@gmail.com
+- senha: rladiessaopaulo
 
 ---
 
