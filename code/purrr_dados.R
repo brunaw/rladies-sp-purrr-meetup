@@ -1,8 +1,8 @@
-#----------------------------------------------------------------------
+#---------------------------------------------------------------------
 # Alissa Mune & Bruna Wundervald
 # R-Ladies Meetup, 21 de Março de 2019
-# Usando purrrr com dados do googleAnalytics
-#----------------------------------------------------------------------
+# Usando purrrr com dados do googleAnalyticsR
+#---------------------------------------------------------------------
 
 # Lendo os dados previamente extraídos
 load("data/RLadies.RData")
@@ -14,6 +14,7 @@ class(meus_dados)
 
 length(meus_dados)
 
+# Atalho do pipe: ctrl + shift + m
 # Vendo os nomes e classes de cada lista
 meus_dados %>% purrr::map(class)
 meus_dados %>% purrr::map(names)
@@ -28,10 +29,6 @@ meus_dados %>%
   magrittr::extract(1:3) %>% 
   purrr::map_dfr(tibble::as_tibble, .id = "id")
   
-# transforma a lista numa tabela com list columns
-meus_dados %>% 
-  purrr::keep(is.data.frame) %>% 
-  purrr::map_dfr(~tibble::tibble(tabela = list(.x)), .id = "id")
 
 # gráfico a partir da lista
 meus_dados %>% 

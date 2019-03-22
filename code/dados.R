@@ -1,4 +1,9 @@
-setwd("C:/Users/Alissa/Desktop/RLadies")
+#---------------------------------------------------------------------
+# Alissa Mune & Bruna Wundervald
+# R-Ladies Meetup, 21 de Março de 2019
+# Usando purrrr com dados do googleAnalyticsR
+#---------------------------------------------------------------------
+
 library(googleAnalyticsR)
 library(tidyverse)
 
